@@ -341,6 +341,13 @@ class IssueTwentySevenTest(unittest.TestCase):
                 '[{"data":"Podstawow\\u0105 opiek\\u0119 zdrowotn\\u0105"}]')
 
 
+class LongLongTest(unittest.TestCase):
+    def runTest(self):
+        val = 9223372036854775807
+        assert type(val) == int
+        assert str(val) == yajl.dumps(val)
+        self.assertEqual(yajl.loads(yajl.dumps({'a': val}))['a'], val)
+
 if __name__ == '__main__':
     verbosity = '-v' in sys.argv and 2 or 1
     runner = unittest.TextTestRunner(verbosity=verbosity)

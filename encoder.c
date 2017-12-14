@@ -160,32 +160,12 @@ static yajl_gen_status ProcessObject(_YajlEncoder *self, PyObject *object)
 #endif
         return yajl_gen_string(handle, buffer, (unsigned int)(length));
     }
-#ifndef IS_PYTHON3
-    if (PyInt_Check(object)) {
-        long number = PyInt_AsLong(object);
+    if (PyLong_Check(object)) {
+        long long number = PyLong_AsLongLong(object);
         if ( (number == -1) && (PyErr_Occurred()) ) {
             return yajl_gen_in_error_state;
         }
         return yajl_gen_integer(handle, number);
-    }
-#endif
-    if (PyLong_Check(object)) {
-        long long number = PyLong_AsLongLong(object);
-        char *buffer = NULL;
-
-        if ( (number == -1) && (PyErr_Occurred()) ) {
-            return yajl_gen_in_error_state;;
-        }
-
-        /*
-         * Nifty trick for getting the buffer length of a long long, going
-         * to convert this long long into a buffer to be handled by
-         * yajl_gen_number()
-         */
-        unsigned int length = (unsigned int)(snprintf(NULL, 0, "%lld", number)) + 1;
-        buffer = (char *)(malloc(length));
-        snprintf(buffer, length, "%lld", number);
-        return yajl_gen_number(handle, buffer, length - 1);
     }
     if (PyFloat_Check(object)) {
         return yajl_gen_double(handle, PyFloat_AsDouble(object));
